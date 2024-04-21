@@ -1,6 +1,7 @@
 ﻿using NetChallenge.Dto.Input;
 using NetChallenge.Infrastructure;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -8,18 +9,10 @@ namespace NetChallenge.Domain
 {
     public class Office
     {        
-
-        [Required]
         public string Name { get; set; }
-
-        [Required]
-        [Range(0, Int64.MaxValue)]
         public int Capacity { get; set; }
-
-        public string LocationName { get; set; }
-                
+        public string LocationName { get; set; }                
         public string[] Resources { get; set; }
-
         public Office( string name, int capacity, string[] resources, string localname)
         {            
             Name = name;
@@ -35,18 +28,27 @@ namespace NetChallenge.Domain
         {
             var locations = new LocationRepository().AsEnumerable();
             var officesCreated = new OfficeRepository().AsEnumerable();
+            
             try 
             {
-                if (officesCreated.Where(x=> x.Name == office.Name && office.LocationName == x.LocationName).Count() == 0 && office.MaxCapacity > 0 && office.Name != string.Empty && office.Name != null && locations.Where(x => x.Name == office.LocationName).Count() == 1)
-                {
+                if(office.MaxCapacity > 0 && office.Name != string.Empty && office.Name != null) 
+                { 
+                    if (OfficeNameIsNotValid(officesCreated, office)) 
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    if (!LocationExists(locations, office)) 
+                    {
+                        throw new Exception();
+                    }
                     return new Office
-                    (
-                        office.Name,
-                        office.MaxCapacity,
-                        office.AvailableResources.ToArray(),
-                        office.LocationName
-                    );
-                }
+                  (
+                      office.Name,
+                      office.MaxCapacity,
+                      office.AvailableResources.ToArray(),
+                      office.LocationName
+                  );
+                }                                                                 
                 else
                     throw new ArgumentException();
             }
@@ -55,6 +57,15 @@ namespace NetChallenge.Domain
                 throw new Exception(ex.Message);
             }
 
+        }
+        private bool LocationExists(IEnumerable<Location> locations, AddOfficeRequest office)
+        {
+            return locations.Where(x => x.Name == office.LocationName).Any();
+        }
+
+        private bool OfficeNameIsNotValid(IEnumerable<Office> officesCreated, AddOfficeRequest office)
+        {
+            return officesCreated.Where(x => x.Name == office.Name && office.LocationName == x.LocationName).Any();
         }
     }
     

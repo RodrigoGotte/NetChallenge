@@ -1,6 +1,7 @@
 ﻿using NetChallenge.Dto.Input;
 using NetChallenge.Infrastructure;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NetChallenge.Domain
@@ -25,21 +26,29 @@ namespace NetChallenge.Domain
             {
                 var list = new LocationRepository().AsEnumerable(); 
                 //TODO:MEJORAR ESTO
-                if (request.Name == string.Empty || request.Name == null || list.Where(x => x.Name == request.Name).Count() == 1 )
+                if (request.Name != string.Empty && request.Name != null && request.Neighborhood != string.Empty && request.Neighborhood != null)
+                {
+                    if (LocationNameExist(list,request)) 
+                    {
+                        throw new ArgumentException();
+                    }
+                    return new Location(request.Name, request.Neighborhood);
+                }
+                else
                 {
                     throw new ArgumentNullException(nameof(request.Name));
-                }
-                if (request.Neighborhood == string.Empty || request.Neighborhood == null)
-                {
-                    throw new ArgumentNullException(nameof(request.Neighborhood));
-                }              
-                return new Location(request.Name, request.Neighborhood);
+                }             
             }
             //TODO CUSTOM EXCEPTIONS
             catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message, nameof(request));
             }
+        }
+
+        private bool LocationNameExist(IEnumerable<Location> list, AddLocationRequest request)
+        {
+            return list.Where(x => x.Name == request.Name).Any();
         }
     }
     
