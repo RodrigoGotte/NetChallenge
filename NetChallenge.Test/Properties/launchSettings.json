@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NetChallenge.Test": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
