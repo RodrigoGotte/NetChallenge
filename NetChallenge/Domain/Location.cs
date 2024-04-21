@@ -1,7 +1,6 @@
 ﻿using NetChallenge.Dto.Input;
-using NetChallenge.Infrastructure.Datastore;
+using NetChallenge.Infrastructure;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace NetChallenge.Domain
@@ -20,12 +19,12 @@ namespace NetChallenge.Domain
 
     public class AddLocations
     {       
-        public Location Add(AddLocationRequest request)
+        public Location AddValidation(AddLocationRequest request)
         {
             try
             {
-               
-                var list =  Datastore.locations.ToList();
+                var list = new LocationRepository().AsEnumerable(); 
+                //TODO:MEJORAR ESTO
                 if (request.Name == string.Empty || request.Name == null || list.Where(x => x.Name == request.Name).Count() == 1 )
                 {
                     throw new ArgumentNullException(nameof(request.Name));
@@ -36,6 +35,7 @@ namespace NetChallenge.Domain
                 }              
                 return new Location(request.Name, request.Neighborhood);
             }
+            //TODO CUSTOM EXCEPTIONS
             catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message, nameof(request));

@@ -25,7 +25,7 @@ namespace NetChallenge
         {
             try 
             {
-                var response = new AddLocations().Add(request);
+                var response = new AddLocations().AddValidation(request);
                 _locationRepository.Add(response);
             }
             catch (Exception ex)
