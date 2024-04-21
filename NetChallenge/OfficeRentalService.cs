@@ -25,7 +25,7 @@ namespace NetChallenge
         {
             try 
             {
-                var response = new AddLocations().AddValidation(request);
+                var response = new LocationValidations().Add(request);
                 _locationRepository.Add(response);
             }
             catch (Exception ex)
@@ -36,7 +36,15 @@ namespace NetChallenge
 
         public void AddOffice(AddOfficeRequest request)
         {
-            throw new NotImplementedException();
+            try 
+            { 
+                var response = new OfficeValidations().Add(request);
+                _officeRepository.Add(response);
+            }
+            catch(Exception ex) 
+            {
+                throw new ArgumentException(ex.Message);
+            }
         }
 
         public void BookOffice(BookOfficeRequest request)
@@ -66,7 +74,17 @@ namespace NetChallenge
 
         public IEnumerable<OfficeDto> GetOffices(string locationName)
         {
-            throw new NotImplementedException();
+            var list = _officeRepository.AsEnumerable().Where(x => locationName == x.LocationName);
+            var response = new List<OfficeDto>();
+            foreach (var office in list)
+                response.Add(new OfficeDto
+                { 
+                    Name=office.Name,
+                    LocationName = office.LocationName,
+                    AvailableResources = office.Resources,
+                    MaxCapacity =  office.Capacity
+                });
+            return response;
         }
 
         public IEnumerable<OfficeDto> GetOfficeSuggestions(SuggestionsRequest request)

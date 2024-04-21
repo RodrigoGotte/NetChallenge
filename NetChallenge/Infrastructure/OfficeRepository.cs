@@ -8,12 +8,12 @@ namespace NetChallenge.Infrastructure
     {
         public IEnumerable<Office> AsEnumerable()
         {
-            throw new System.NotImplementedException();
+            return Datastore.Datastore.offices;
         }
 
         public void Add(Office item)
         {
-            throw new System.NotImplementedException();
+            Datastore.Datastore.offices.Add(item);
         }
     }
 }

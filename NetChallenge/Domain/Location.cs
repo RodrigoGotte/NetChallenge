@@ -17,9 +17,9 @@ namespace NetChallenge.Domain
         }        
     }
 
-    public class AddLocations
+    public class LocationValidations
     {       
-        public Location AddValidation(AddLocationRequest request)
+        public Location Add(AddLocationRequest request)
         {
             try
             {
