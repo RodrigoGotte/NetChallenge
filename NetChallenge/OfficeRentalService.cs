@@ -25,8 +25,11 @@ namespace NetChallenge
         {
             try 
             {
-                var response = new LocationValidations().Add(request);
-                _locationRepository.Add(response);
+                if (request.Name != string.Empty && request.Name != null && request.Neighborhood != string.Empty && request.Neighborhood != null) 
+                { 
+                    var response = new LocationValidations().Add(request, GetLocations());
+                    _locationRepository.Add(response);
+                }
             }
             catch (Exception ex)
             {
@@ -37,9 +40,16 @@ namespace NetChallenge
         public void AddOffice(AddOfficeRequest request)
         {
             try 
-            { 
-                var response = new OfficeValidations().Add(request);
-                _officeRepository.Add(response);
+            {
+                if (request.MaxCapacity > 0 && request.Name != string.Empty && request.Name != null)
+                {
+                    var response = new OfficeValidations().Add(request,GetLocations(), GetOffices(request.LocationName) );
+                    _officeRepository.Add(response);
+                }
+                else 
+                { 
+                    throw new ArgumentException();
+                }
             }
             catch(Exception ex) 
             {
@@ -49,19 +59,47 @@ namespace NetChallenge
 
         public void BookOffice(BookOfficeRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (request.UserName != string.Empty && request.UserName != null && request.Duration > TimeSpan.Zero)
+                {
+                    var response = new BookingValidations().Add(request, GetBookings(request.LocationName,request.OfficeName), GetOffices(request.LocationName));
+                    _bookingRepository.Add(response);
+                }
+                else 
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception ex)            
+            {
+                throw new ArgumentException(ex.Message);
+            }
         }
 
         public IEnumerable<BookingDto> GetBookings(string locationName, string officeName)
         {
-            throw new NotImplementedException();
+            var bookingsCreated = _bookingRepository.AsEnumerable().Where(x => x.LocationName == locationName && x.OfficeName == officeName);
+            var response = new List<BookingDto>();
+            foreach (var booking in bookingsCreated)
+            {
+                response.Add(new BookingDto
+                {
+                   LocationName = booking.LocationName,
+                   DateTime = booking.Reservation,
+                   Duration = booking.Duration,
+                   OfficeName = booking.OfficeName,
+                   UserName = booking.User
+                });
+            }
+            return response;
         }
 
         public IEnumerable<LocationDto> GetLocations()
         {
-            var list = _locationRepository.AsEnumerable();
+            var locationCreated = _locationRepository.AsEnumerable();
             var response = new List<LocationDto>();
-            foreach (var location in list)
+            foreach (var location in locationCreated)
             {
                 response.Add(new LocationDto
                 {
@@ -74,9 +112,9 @@ namespace NetChallenge
 
         public IEnumerable<OfficeDto> GetOffices(string locationName)
         {
-            var list = _officeRepository.AsEnumerable().Where(x => locationName == x.LocationName);
+            var officeCreated = _officeRepository.AsEnumerable().Where(x => locationName == x.LocationName);
             var response = new List<OfficeDto>();
-            foreach (var office in list)
+            foreach (var office in officeCreated)
                 response.Add(new OfficeDto
                 { 
                     Name=office.Name,

@@ -1,5 +1,5 @@
 ﻿using NetChallenge.Dto.Input;
-using NetChallenge.Infrastructure;
+using NetChallenge.Dto.Output;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,37 +7,28 @@ using System.Linq;
 namespace NetChallenge.Domain
 {
     public class Location
-    {                               
-        public  string Name {  get; set; }
-        public  string City { get; set; }
+    {
+        public string Name { get; set; }
+        public string City { get; set; }
 
-        public Location(string name, string city) 
-        {            
+        public Location(string name, string city)
+        {
             Name = name;
             City = city;
-        }        
+        }
     }
 
     public class LocationValidations
-    {       
-        public Location Add(AddLocationRequest request)
+    {
+        public Location Add(AddLocationRequest request, IEnumerable<LocationDto> locationsCreated)
         {
             try
-            {
-                var list = new LocationRepository().AsEnumerable(); 
-                //TODO:MEJORAR ESTO
-                if (request.Name != string.Empty && request.Name != null && request.Neighborhood != string.Empty && request.Neighborhood != null)
+            {                
+                if (LocationNameExist(locationsCreated, request))
                 {
-                    if (LocationNameExist(list,request)) 
-                    {
-                        throw new ArgumentException();
-                    }
-                    return new Location(request.Name, request.Neighborhood);
+                    throw new ArgumentException();
                 }
-                else
-                {
-                    throw new ArgumentNullException(nameof(request.Name));
-                }             
+                return new Location(request.Name, request.Neighborhood);                                         
             }
             //TODO CUSTOM EXCEPTIONS
             catch (Exception ex)
@@ -46,7 +37,7 @@ namespace NetChallenge.Domain
             }
         }
 
-        private bool LocationNameExist(IEnumerable<Location> list, AddLocationRequest request)
+        private bool LocationNameExist(IEnumerable<LocationDto> list, AddLocationRequest request)
         {
             return list.Where(x => x.Name == request.Name).Any();
         }

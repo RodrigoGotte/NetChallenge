@@ -1,7 +1,5 @@
 ﻿using NetChallenge.Domain;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NetChallenge.Infrastructure.Datastore
 {
@@ -10,5 +8,7 @@ namespace NetChallenge.Infrastructure.Datastore
         public static List<Location> locations = new List<Location>();
 
         public static List<Office> offices = new List<Office>();
+
+        public static List<Booking> bookings = new List<Booking>();
     }
 }

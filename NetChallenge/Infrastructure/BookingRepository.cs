@@ -8,12 +8,12 @@ namespace NetChallenge.Infrastructure
     {
         public IEnumerable<Booking> AsEnumerable()
         {
-            throw new System.NotImplementedException();
+            return Datastore.Datastore.bookings;
         }
 
         public void Add(Booking item)
         {
-            throw new System.NotImplementedException();
+            Datastore.Datastore.bookings.Add(item);
         }
     }
 }

@@ -1,23 +1,24 @@
 ﻿using NetChallenge.Dto.Input;
+using NetChallenge.Dto.Output;
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NetChallenge.Domain
 {
     public class Booking
-    {               
-        public DateTime Reservation {  get; set; }
+    {
+        public string LocationName { get; set; }
+        public DateTime Reservation { get; set; }
 
-        [Required]
-        [Range(0, Int64.MaxValue)]
         public TimeSpan Duration { get; set; }
-        
-        [Required]
+
         public string User { get; set; }
         public string OfficeName { get; set; }
 
-        public Booking( DateTime reservation,TimeSpan duration, string user, string officeName) 
+        public Booking(string locationName, DateTime reservation,TimeSpan duration, string user, string officeName) 
         {
+            LocationName = locationName;
             Reservation = reservation;
             Duration = duration;
             User = user;
@@ -27,23 +28,26 @@ namespace NetChallenge.Domain
 
     public class BookingValidations 
     {
-
-        public Booking Add(BookOfficeRequest book) 
+        public Booking Add(BookOfficeRequest book, IEnumerable<BookingDto> bookingsCreated, IEnumerable<OfficeDto> officesCreated) 
         {
             try
-            {
-                if (book.UserName != string.Empty || book.Duration > TimeSpan.Zero) 
-                { 
-                    if (OfficeisValid())
-                    {
-                        throw new InvalidOperationException();
-                    }
-                    if (OfficeIsAvailable()) 
-                    {
-                        throw new Exception();
-                    }
+            {                
+                if (OfficeisNotValid(officesCreated,book))
+                {
+                    throw new InvalidOperationException();                                        
+                }                    
+                if (OfficeIsNotAvailable(bookingsCreated,book))                 
+                {                
+                    throw new Exception();                    
                 }
-                return null;
+                return new Booking
+                    (
+                    book.LocationName,
+                    book.DateTime,
+                    book.Duration,
+                    book.UserName,
+                    book.OfficeName
+                    );
             }
             catch(Exception ex)
             { 
@@ -51,14 +55,16 @@ namespace NetChallenge.Domain
             }            
         }
 
-        private bool OfficeIsAvailable()
+        private bool OfficeIsNotAvailable(IEnumerable<BookingDto> bookingsCreated, BookOfficeRequest book)
         {
-            throw new NotImplementedException();
+            return bookingsCreated.Where(x =>
+            //before                                        //after
+            (book.DateTime + book.Duration < x.DateTime) && book.DateTime >x.DateTime + x.Duration ).Any();
         }
 
-        private bool OfficeisValid()
+        private bool OfficeisNotValid(IEnumerable<OfficeDto> officesCreated, BookOfficeRequest book)
         {
-            throw new NotImplementedException();
+            return  !officesCreated.Where(x => x.Name == book.OfficeName).Any();
         }
     } 
 }

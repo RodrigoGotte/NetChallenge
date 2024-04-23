@@ -1,8 +1,7 @@
 ﻿using NetChallenge.Dto.Input;
-using NetChallenge.Infrastructure;
+using NetChallenge.Dto.Output;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace NetChallenge.Domain
@@ -13,6 +12,7 @@ namespace NetChallenge.Domain
         public int Capacity { get; set; }
         public string LocationName { get; set; }                
         public string[] Resources { get; set; }
+        
         public Office( string name, int capacity, string[] resources, string localname)
         {            
             Name = name;
@@ -24,33 +24,25 @@ namespace NetChallenge.Domain
 
     public class OfficeValidations 
     {
-        public Office Add(AddOfficeRequest office) 
-        {
-            var locations = new LocationRepository().AsEnumerable();
-            var officesCreated = new OfficeRepository().AsEnumerable();
-            
+        public Office Add(AddOfficeRequest office, IEnumerable<LocationDto> locationsCreated, IEnumerable<OfficeDto> officesCreated) 
+        {                        
             try 
-            {
-                if(office.MaxCapacity > 0 && office.Name != string.Empty && office.Name != null) 
-                { 
-                    if (OfficeNameIsNotValid(officesCreated, office)) 
-                    {
-                        throw new InvalidOperationException();
-                    }
-                    if (!LocationExists(locations, office)) 
-                    {
-                        throw new Exception();
-                    }
-                    return new Office
-                  (
-                      office.Name,
-                      office.MaxCapacity,
-                      office.AvailableResources.ToArray(),
-                      office.LocationName
-                  );
-                }                                                                 
-                else
-                    throw new ArgumentException();
+            {               
+                if (OfficeNameIsNotValid(officesCreated, office)) 
+                {
+                    throw new InvalidOperationException();                    
+                }                    
+                if (!LocationExists(locationsCreated, office))                 
+                {                
+                    throw new Exception();                    
+                }                
+                return new Office                  
+                    (                 
+                    office.Name,                    
+                    office.MaxCapacity,                    
+                    office.AvailableResources.ToArray(),                    
+                    office.LocationName                  
+                    );                  
             }
             catch (Exception ex)             
             {
@@ -58,12 +50,12 @@ namespace NetChallenge.Domain
             }
 
         }
-        private bool LocationExists(IEnumerable<Location> locations, AddOfficeRequest office)
+        private bool LocationExists(IEnumerable<LocationDto> locations, AddOfficeRequest office)
         {
             return locations.Where(x => x.Name == office.LocationName).Any();
         }
 
-        private bool OfficeNameIsNotValid(IEnumerable<Office> officesCreated, AddOfficeRequest office)
+        private bool OfficeNameIsNotValid(IEnumerable<OfficeDto> officesCreated, AddOfficeRequest office)
         {
             return officesCreated.Where(x => x.Name == office.Name && office.LocationName == x.LocationName).Any();
         }
