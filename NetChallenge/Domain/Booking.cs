@@ -57,14 +57,16 @@ namespace NetChallenge.Domain
 
         private bool OfficeIsNotAvailable(IEnumerable<BookingDto> bookingsCreated, BookOfficeRequest book)
         {
-            return bookingsCreated.Where(x =>
-            //before                                        //after
-            (book.DateTime + book.Duration < x.DateTime) && book.DateTime >x.DateTime + x.Duration ).Any();
+           
+           return bookingsCreated.Any(x =>
+                    x.DateTime == book.DateTime ||
+                   (x.DateTime + x.Duration > book.DateTime && book.DateTime > x.DateTime)||
+                   (book.DateTime + book.Duration > x.DateTime && x.DateTime > book.DateTime)); 
         }
 
         private bool OfficeisNotValid(IEnumerable<OfficeDto> officesCreated, BookOfficeRequest book)
         {
-            return  !officesCreated.Where(x => x.Name == book.OfficeName).Any();
+            return  !officesCreated.Any(x => x.Name == book.OfficeName);
         }
     } 
 }

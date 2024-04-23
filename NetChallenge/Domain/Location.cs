@@ -37,9 +37,9 @@ namespace NetChallenge.Domain
             }
         }
 
-        private bool LocationNameExist(IEnumerable<LocationDto> list, AddLocationRequest request)
+        private bool LocationNameExist(IEnumerable<LocationDto> locationCreated, AddLocationRequest request)
         {
-            return list.Where(x => x.Name == request.Name).Any();
+            return locationCreated.Any(x => x.Name == request.Name);
         }
     }
     
