@@ -12,46 +12,50 @@ namespace NetChallenge
     {
         private readonly ILocationRepository _locationRepository;
         private readonly IOfficeRepository _officeRepository;
-        private readonly IBookingRepository _bookingRepository;       
+        private readonly IBookingRepository _bookingRepository;
 
         public OfficeRentalService(ILocationRepository locationRepository, IOfficeRepository officeRepository, IBookingRepository bookingRepository)
         {
             _locationRepository = locationRepository;
             _officeRepository = officeRepository;
-            _bookingRepository = bookingRepository;            
+            _bookingRepository = bookingRepository;
         }
 
         public void AddLocation(AddLocationRequest request)
         {
-            try 
+            try
             {
-                if (request.Name != string.Empty && request.Name != null && request.Neighborhood != string.Empty && request.Neighborhood != null) 
-                { 
+                if (request.Name != string.Empty && request.Name != null && request.Neighborhood != string.Empty && request.Neighborhood != null)
+                {
                     var response = new LocationValidations().Add(request, GetLocations());
                     _locationRepository.Add(response);
+                }
+                else
+                {
+                    throw new Exception();
                 }
             }
             catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message);
-            }            
+            }
         }
 
         public void AddOffice(AddOfficeRequest request)
         {
-            try 
+            try
             {
                 if (request.MaxCapacity > 0 && request.Name != string.Empty && request.Name != null)
                 {
-                    var response = new OfficeValidations().Add(request,GetLocations(), GetOffices(request.LocationName) );
+                    var response = new OfficeValidations().Add(request, GetLocations(), GetOffices(request.LocationName));
                     _officeRepository.Add(response);
                 }
-                else 
-                { 
+                else
+                {
                     throw new ArgumentException();
                 }
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message);
             }
@@ -63,15 +67,15 @@ namespace NetChallenge
             {
                 if (request.UserName != string.Empty && request.UserName != null && request.Duration > TimeSpan.Zero)
                 {
-                    var response = new BookingValidations().Add(request, GetBookings(request.LocationName,request.OfficeName), GetOffices(request.LocationName));
+                    var response = new BookingValidations().Add(request, GetBookings(request.LocationName, request.OfficeName), GetOffices(request.LocationName));
                     _bookingRepository.Add(response);
                 }
-                else 
+                else
                 {
                     throw new Exception();
                 }
             }
-            catch (Exception ex)            
+            catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message);
             }
@@ -85,11 +89,11 @@ namespace NetChallenge
             {
                 response.Add(new BookingDto
                 {
-                   LocationName = booking.LocationName,
-                   DateTime = booking.Reservation,
-                   Duration = booking.Duration,
-                   OfficeName = booking.OfficeName,
-                   UserName = booking.User
+                    LocationName = booking.LocationName,
+                    DateTime = booking.Reservation,
+                    Duration = booking.Duration,
+                    OfficeName = booking.OfficeName,
+                    UserName = booking.User
                 });
             }
             return response;
@@ -107,7 +111,7 @@ namespace NetChallenge
                     Neighborhood = location.City
                 });
             }
-            return response;           
+            return response;
         }
 
         public IEnumerable<OfficeDto> GetOffices(string locationName)
@@ -116,18 +120,52 @@ namespace NetChallenge
             var response = new List<OfficeDto>();
             foreach (var office in officeCreated)
                 response.Add(new OfficeDto
-                { 
-                    Name=office.Name,
+                {
+                    Name = office.Name,
                     LocationName = office.LocationName,
                     AvailableResources = office.Resources,
-                    MaxCapacity =  office.Capacity
+                    MaxCapacity = office.Capacity
                 });
             return response;
         }
 
         public IEnumerable<OfficeDto> GetOfficeSuggestions(SuggestionsRequest request)
         {
-            throw new NotImplementedException();
+            IEnumerable<OfficeDto> officesCreated = MapperToDto(_officeRepository.AsEnumerable());
+            IEnumerable<OfficeDto> response = new List<OfficeDto>();
+            var service = new SuggestedOffices();
+            if (request.CapacityNeeded <= 1 && request.PreferedNeigborHood == null && request.ResourcesNeeded.Count() == 0) 
+            {
+                return officesCreated.OrderBy(x => x.AvailableResources.Count());
+            }
+            if (request.PreferedNeigborHood != null)
+            {
+                response = response.Concat(service.GetOfficesForNeighborhood(request, officesCreated, GetLocations()));
+            }
+            if (request.CapacityNeeded > 1)
+            {
+                response = service.GetOfficesForCapacity(request, officesCreated);
+            }
+            if (request.ResourcesNeeded.Any()) 
+            {
+                response = response.Concat(service.GetOfficesForResources(request, officesCreated));
+            }
+            
+            return response.Distinct();
+        }
+
+        private IEnumerable<OfficeDto> MapperToDto(IEnumerable<Office> domain) 
+        {
+            var response = new List<OfficeDto>();
+            foreach (var office in domain)
+                response.Add(new OfficeDto
+                {
+                    Name = office.Name,
+                    LocationName = office.LocationName,
+                    AvailableResources = office.Resources,
+                    MaxCapacity = office.Capacity
+                });
+            return response;
         }
     }
 }

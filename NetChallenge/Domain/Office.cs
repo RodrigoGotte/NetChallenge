@@ -3,6 +3,7 @@ using NetChallenge.Dto.Output;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace NetChallenge.Domain
 {
@@ -60,5 +61,51 @@ namespace NetChallenge.Domain
             return officesCreated.Any(x => x.Name == office.Name && office.LocationName == x.LocationName);
         }
     }
-    
+
+    public class SuggestedOffices
+    {
+        internal IEnumerable<OfficeDto> GetOfficesForCapacity(SuggestionsRequest request, IEnumerable<OfficeDto> officesCreated)
+        {
+
+            var response = officesCreated.Where(x =>
+                                                    (x.MaxCapacity - request.CapacityNeeded == -1 )
+                                                    || (Math.Abs(x.MaxCapacity - request.CapacityNeeded) < 5 
+                                                    && request.CapacityNeeded <= x.MaxCapacity))
+                                                    .OrderByDescending(x=>x.MaxCapacity);           
+            return response;
+        }
+
+        internal IEnumerable<OfficeDto> GetOfficesForNeighborhood(SuggestionsRequest request,IEnumerable<OfficeDto> officesCreated, IEnumerable<LocationDto> locationsCreated)
+        {
+            var response = officesCreated;
+            if (locationsCreated.Any(x => x.Neighborhood == request.PreferedNeigborHood)) 
+            { 
+                 response = officesCreated.Join
+                              (locationsCreated,
+                                OfficeDto => OfficeDto.LocationName,
+                                locationDto => locationDto.Name,
+                                (x, y) => new
+                                {
+                                    OfficeDto = x, LocationDto = y
+                                }).OrderByDescending(x => x.LocationDto.Neighborhood == request.PreferedNeigborHood)
+                                .Select(x => x.OfficeDto) ;
+            }
+            return response;
+        }
+
+        internal IEnumerable<OfficeDto> GetOfficesForResources(SuggestionsRequest request, IEnumerable<OfficeDto> officesCreated)
+        {
+            var response = officesCreated.Where(x =>
+                                                x.AvailableResources.Any(
+                                                                        y => request.ResourcesNeeded.Any(r => r == y)));
+            if (response.Any()) 
+            { 
+                var officeResourcesLessCantity = response.Select(x => x.AvailableResources.Count()).Min();
+                response.Where(x => x.AvailableResources.Count() == officeResourcesLessCantity);
+            }
+            return response;
+        }
+    }
+
+
 }
