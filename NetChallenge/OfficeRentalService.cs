@@ -97,48 +97,21 @@ namespace NetChallenge
         public IEnumerable<BookingDto> GetBookings(string locationName, string officeName)
         {
             var bookingsCreated = _bookingRepository.AsEnumerable().Where(x => x.LocationName == locationName && x.OfficeName == officeName);
-            var response = new List<BookingDto>();
-            foreach (var booking in bookingsCreated)
-            {
-                response.Add(new BookingDto
-                {
-                    LocationName = booking.LocationName,
-                    DateTime = booking.Reservation,
-                    Duration = booking.Duration,
-                    OfficeName = booking.OfficeName,
-                    UserName = booking.User
-                });
-            }
+            var response = MapperToDto(bookingsCreated);
             return response;
         }
 
         public IEnumerable<LocationDto> GetLocations()
         {
             var locationCreated = _locationRepository.AsEnumerable();
-            var response = new List<LocationDto>();
-            foreach (var location in locationCreated)
-            {
-                response.Add(new LocationDto
-                {
-                    Name = location.Name,
-                    Neighborhood = location.Neighborhood
-                });
-            }
+            var response = MapperToDto(locationCreated);            
             return response;
         }
 
         public IEnumerable<OfficeDto> GetOffices(string locationName)
         {
             var officeCreated = _officeRepository.AsEnumerable().Where(x => locationName == x.LocationName);
-            var response = new List<OfficeDto>();
-            foreach (var office in officeCreated)
-                response.Add(new OfficeDto
-                {
-                    Name = office.Name,
-                    LocationName = office.LocationName,
-                    AvailableResources = office.Resources,
-                    MaxCapacity = office.Capacity
-                });
+            var response = MapperToDto(officeCreated);
             return response;
         }
 
@@ -178,6 +151,38 @@ namespace NetChallenge
                     AvailableResources = office.Resources,
                     MaxCapacity = office.Capacity
                 });
+            return response;
+
+
+        }
+        private IEnumerable<LocationDto> MapperToDto(IEnumerable<Location> domain)         
+        {                
+            var response = new List<LocationDto>();                   
+            foreach (var location in domain)                    
+            {
+                response.Add(new LocationDto
+                {
+                    Name = location.Name,
+                    Neighborhood = location.Neighborhood 
+                });
+            }
+            return response;
+        }
+
+        private IEnumerable<BookingDto> MapperToDto(IEnumerable<Booking> domain)
+        {
+            var response = new List<BookingDto>();
+            foreach (var booking in domain)
+            {
+                response.Add(new BookingDto
+                {
+                    LocationName = booking.LocationName,
+                    DateTime = booking.Reservation,
+                    Duration = booking.Duration,
+                    OfficeName = booking.OfficeName,
+                    UserName = booking.User
+                });
+            }
             return response;
         }
     }
