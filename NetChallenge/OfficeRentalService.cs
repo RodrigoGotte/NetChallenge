@@ -33,12 +33,12 @@ namespace NetChallenge
                 }
                 else
                 {
-                    throw new ModelStateNotValid();
+                    throw new RequestNotValid();
                 }
             }
-            catch (ModelStateNotValid)
+            catch (RequestNotValid)
             {
-                throw new ModelStateNotValid();
+                throw new RequestNotValid();
             }
             catch (Exception ex)
             {
@@ -57,10 +57,10 @@ namespace NetChallenge
                 }
                 else
                 {
-                    throw new ModelStateNotValid();
+                    throw new RequestNotValid();
                 }
             }
-            catch (ModelStateNotValid)
+            catch (RequestNotValid)
             {
                 throw;
             }
@@ -81,12 +81,12 @@ namespace NetChallenge
                 }
                 else
                 {
-                    throw new ModelStateNotValid();
+                    throw new RequestNotValid();
                 }
             }
-            catch (ModelStateNotValid)
+            catch (RequestNotValid)
             {
-                throw new ModelStateNotValid();
+                throw new RequestNotValid();
             }
             catch (Exception ex)
             {
