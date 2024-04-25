@@ -152,9 +152,8 @@ namespace NetChallenge
                     MaxCapacity = office.Capacity
                 });
             return response;
-
-
         }
+
         private IEnumerable<LocationDto> MapperToDto(IEnumerable<Location> domain)         
         {                
             var response = new List<LocationDto>();                   
