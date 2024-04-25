@@ -38,11 +38,11 @@ namespace NetChallenge
             }
             catch (ModelStateNotValid)
             {
-                throw;
+                throw new ModelStateNotValid();
             }
             catch (Exception ex)
             {
-                throw new ArgumentException(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -66,7 +66,7 @@ namespace NetChallenge
             }
             catch (Exception ex)
             {
-                throw new ArgumentException(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -86,11 +86,11 @@ namespace NetChallenge
             }
             catch (ModelStateNotValid)
             {
-                throw;
+                throw new ModelStateNotValid();
             }
             catch (Exception ex)
             {
-                throw new ArgumentException(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -121,7 +121,7 @@ namespace NetChallenge
                 response.Add(new LocationDto
                 {
                     Name = location.Name,
-                    Neighborhood = location.City
+                    Neighborhood = location.Neighborhood
                 });
             }
             return response;

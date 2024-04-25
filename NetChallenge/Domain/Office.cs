@@ -45,8 +45,8 @@ namespace NetChallenge.Domain
                     office.LocationName
                     );
             }
-            catch (OfficeIsNotValid) { throw; }
-            catch (LocationExist) { throw; }
+            catch (OfficeIsNotValid) { throw new OfficeIsNotValid(); }
+            catch (LocationExist) { throw new LocationExist(); }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);

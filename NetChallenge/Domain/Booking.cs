@@ -1,7 +1,6 @@
 ﻿using NetChallenge.Dto.Input;
 using NetChallenge.Dto.Output;
 using NetChallenge.Exceptions.DomainExceptions;
-using NetChallenge.Exceptions.DomainExceptions.OfficeExceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +11,7 @@ namespace NetChallenge.Domain
     {
         public string LocationName { get; set; }
         public DateTime Reservation { get; set; }
-
         public TimeSpan Duration { get; set; }
-
         public string User { get; set; }
         public string OfficeName { get; set; }
 
@@ -34,9 +31,9 @@ namespace NetChallenge.Domain
         {
             try
             {                
-                if (OfficeisNotValid(officesCreated,book))
+                if (BookOfficeIsNotValid(officesCreated,book))
                 {
-                    throw new OfficeIsNotValid();                                        
+                    throw new BookOfficeIsNotValid();                                        
                 }                    
                 if (OfficeIsNotAvailable(bookingsCreated,book))                 
                 {                
@@ -51,8 +48,8 @@ namespace NetChallenge.Domain
                     book.OfficeName
                     );
             }
-            catch (OfficeIsNotValid) { throw; }
-            catch (OfficeIsNotAvailable) { throw; }
+            catch (BookOfficeIsNotValid) { throw new BookOfficeIsNotValid(); }
+            catch (OfficeIsNotAvailable) { throw new OfficeIsNotAvailable(); }
             catch (Exception ex)
             { 
                 throw new Exception(ex.Message);
@@ -68,7 +65,7 @@ namespace NetChallenge.Domain
                    (book.DateTime + book.Duration > x.DateTime && x.DateTime > book.DateTime)); 
         }
 
-        private bool OfficeisNotValid(IEnumerable<OfficeDto> officesCreated, BookOfficeRequest book)
+        private bool BookOfficeIsNotValid(IEnumerable<OfficeDto> officesCreated, BookOfficeRequest book)
         {
             return  !officesCreated.Any(x => x.Name == book.OfficeName);
         }

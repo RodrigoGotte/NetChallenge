@@ -1,7 +1,6 @@
 ﻿using NetChallenge.Dto.Input;
 using NetChallenge.Dto.Output;
 using NetChallenge.Exceptions.DomainExceptions;
-using NetChallenge.Exceptions.DomainExceptions.OfficeExceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,10 +31,10 @@ namespace NetChallenge.Domain
                 }
                 return new Location(request.Name, request.Neighborhood);                                         
             }
-            catch (LocationNameExist) { throw; }
+            catch (LocationNameExist) { throw new LocationNameExist(); }
             catch (Exception ex)
             {
-                throw new ArgumentException(ex.Message, nameof(request));
+                throw new Exception(ex.Message);
             }
         }
 

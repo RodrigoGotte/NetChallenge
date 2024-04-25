@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NetChallenge.Exceptions.DomainExceptions.OfficeExceptions
+namespace NetChallenge.Exceptions.DomainExceptions
 {
     public class OfficeIsNotAvailable : Exception
     {
