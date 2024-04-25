@@ -1,9 +1,9 @@
 ﻿using NetChallenge.Dto.Input;
 using NetChallenge.Dto.Output;
+using NetChallenge.Exceptions.DomainExceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 
 namespace NetChallenge.Domain
 {
@@ -31,11 +31,11 @@ namespace NetChallenge.Domain
             {
                 if (OfficeNameIsNotValid(officesCreated, office))
                 {
-                    throw new InvalidOperationException();
+                    throw new OfficeIsNotValid();
                 }
                 if (!LocationExists(locationsCreated, office))
                 {
-                    throw new Exception();
+                    throw new LocationExist();
                 }
                 return new Office
                     (
@@ -45,6 +45,8 @@ namespace NetChallenge.Domain
                     office.LocationName
                     );
             }
+            catch (OfficeIsNotValid) { throw; }
+            catch (LocationExist) { throw; }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);

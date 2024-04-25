@@ -5,6 +5,7 @@ using NetChallenge.Abstractions;
 using NetChallenge.Domain;
 using NetChallenge.Dto.Input;
 using NetChallenge.Dto.Output;
+using NetChallenge.Exceptions.ServiceExceptions;
 
 namespace NetChallenge
 {
@@ -32,8 +33,12 @@ namespace NetChallenge
                 }
                 else
                 {
-                    throw new Exception();
+                    throw new ModelStateNotValid();
                 }
+            }
+            catch (ModelStateNotValid)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -52,8 +57,12 @@ namespace NetChallenge
                 }
                 else
                 {
-                    throw new ArgumentException();
+                    throw new ModelStateNotValid();
                 }
+            }
+            catch (ModelStateNotValid)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -72,8 +81,12 @@ namespace NetChallenge
                 }
                 else
                 {
-                    throw new Exception();
+                    throw new ModelStateNotValid();
                 }
+            }
+            catch (ModelStateNotValid)
+            {
+                throw;
             }
             catch (Exception ex)
             {

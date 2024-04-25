@@ -1,5 +1,7 @@
 ﻿using NetChallenge.Dto.Input;
 using NetChallenge.Dto.Output;
+using NetChallenge.Exceptions.DomainExceptions;
+using NetChallenge.Exceptions.DomainExceptions.OfficeExceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,11 +36,11 @@ namespace NetChallenge.Domain
             {                
                 if (OfficeisNotValid(officesCreated,book))
                 {
-                    throw new InvalidOperationException();                                        
+                    throw new OfficeIsNotValid();                                        
                 }                    
                 if (OfficeIsNotAvailable(bookingsCreated,book))                 
                 {                
-                    throw new Exception();                    
+                    throw new OfficeIsNotAvailable();                    
                 }
                 return new Booking
                     (
@@ -49,7 +51,9 @@ namespace NetChallenge.Domain
                     book.OfficeName
                     );
             }
-            catch(Exception ex)
+            catch (OfficeIsNotValid) { throw; }
+            catch (OfficeIsNotAvailable) { throw; }
+            catch (Exception ex)
             { 
                 throw new Exception(ex.Message);
             }            
